@@ -110,7 +110,7 @@ dematRouter.post("/buy", async (req, res) => {
     const dematAccount = await DematModel.findOne({ userID });
 
     if (!dematAccount) {
-      return res.status(404).json({ error: "Demat account not found Please create Demate account" });
+      return res.status(404).json({ msg: "Demat account not found Please create Demate account" });
     }
 
     dematAccount.holdings.push({
@@ -124,32 +124,30 @@ dematRouter.post("/buy", async (req, res) => {
 
     res
       .status(200)
-      .json({updated, error: "Congratulations you have purchase stock" });
+      .json({updated, msg: "Congratulations you have purchase stock" });
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ msg: "Server error" });
   }
 });
 
 // Sell stocks route
-dematRouter.post("/sell", async (req, res) => {
+dematRouter.post('/sell', async (req, res) => {
   try {
-    
-    const { accountNumber, stockSymbol, quantity, price } = req.body;
+    // Extract the data from the request body
+    const { userID, stockSymbol, quantity, price } = req.body;
 
-   
+    // Find the demat account based on the account number
     const dematAccount = await DematModel.findOne({ userID });
 
     if (!dematAccount) {
-      return res.status(404).json({ error: "Demat account not found" });
+      return res.status(404).json({ error: 'Demat account not found' });
     }
 
     // Find the stock holding to sell
-    const holding = dematAccount.holdings.find(
-      (holding) => holding.stockSymbol === stockSymbol
-    );
+    const holding = dematAccount.holdings.find((holding) => holding.stockSymbol === stockSymbol);
 
     if (!holding || holding.quantity < quantity) {
-      return res.status(400).json({ error: "Insufficient stock quantity" });
+      return res.status(400).json({ error: 'Insufficient stock quantity' });
     }
 
     // Update the quantity and average price of the stock holding
@@ -157,18 +155,16 @@ dematRouter.post("/sell", async (req, res) => {
 
     if (holding.quantity === 0) {
       // Remove the holding if the quantity becomes zero
-      dematAccount.holdings = dematAccount.holdings.filter(
-        (holding) => holding.quantity > 0
-      );
+      dematAccount.holdings = dematAccount.holdings.filter((holding) => holding.quantity > 0);
     }
 
     // Update the balance and add a transaction for the sale
-    await DematModel.findOneAndUpdate({ accountNumber }, dematAccount);
+    await dematAccount.updateBalanceAndTransaction('Sell', stockSymbol, quantity, price);
 
     res.status(200).json(dematAccount);
   } catch (error) {
-    console.error("Error selling stocks:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error('Error selling stocks:', error);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 

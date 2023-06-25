@@ -5,8 +5,9 @@ const { stockRouter } = require("./routes/stock.routes");
 const { dematRouter } = require("./routes/demat.routes");
 const cors = require("cors");
 require("dotenv").config()
-
+const cookieParser=require("cookie-parser")
 const app = express()
+app.use(cookieParser());
 app.use(cors())
 app.use(express.json())
 

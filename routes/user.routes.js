@@ -61,16 +61,17 @@ userRouter.post("/login", async (req, res) => {
                 { userID: user._id, user: user.firstName },
                 process.env.secret
               );
+              res.cookie('token', token, { httpOnly: true })
               res.json({ msg: "Logged In!", token,user:user.firstName });
             } else {
                 res.status(400).json({ msg: "Wrong Credentials" });
             }
           });
         } else {
-           res.status(400).json({ msg: "User does  not exist" });
+           res.status(400).json({ msg: "User does  not exist Please Register first",newuser:true});
         }
       } catch (err) {
-         res.status(400).json({ error: err.message });
+         res.status(400).json({ msg: err.message });
       }
   }else{
     res.status(404).json({msg:`please enter-${!email?"email":"password"}`})

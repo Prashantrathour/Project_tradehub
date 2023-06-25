@@ -12,13 +12,13 @@ const auth = (req,res,next) => {
               
                 next()
             }else{
-                res.status(404).json({error:"Not Authorized"})
+                res.status(404).json({msg:"Not Authorized"})
             }
         }catch(err){
-            res.status(404).json({error:err.message})
+            res.status(404).json({msg:"Something wrong Please Login Again"})
         }
     }else{
-        res.status(404).json({error:"Please Login First!"})
+        res.status(404).json({msg:"Please Login First!"})
     }
 }
 
