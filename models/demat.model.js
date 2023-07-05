@@ -5,9 +5,10 @@ const dematSchema = new mongoose.Schema({
   accountHolderName: String,
   balance: Number,
   email:String,
-  mobilenumber:Number,
+  mobilenumber:String,
   user:String,
   userID:String,
+  verificationStatus:Boolean,
   holdings: [
     {
       stockSymbol: String,
@@ -18,7 +19,10 @@ const dematSchema = new mongoose.Schema({
   transactions: [
     {
       transactionId: mongoose.Types.ObjectId,
-      date: Date,
+      date:  {
+        type: String,
+        default: () => new Date().toLocaleString()
+      },
       
       stockSymbol: String,
       quantity: Number,
